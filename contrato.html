@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrato de Servicios Musicales &mdash; KONTRABANDA</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Barlow:ital,wght@0,400;0,600;0,700;1,400&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<script data-cfasync="false" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--negro:#0D0D0D;--crema:#F5F0E8;--oro:#C9A84C;--oro-claro:#E8CC7A;--gris-osc:#2A2420;--gris-med:#8A8480;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--negro);font-family:'Barlow',Georgia,serif;color:var(--negro);min-height:100vh;}
+.contrato-wrap{max-width:760px;margin:0 auto;padding:24px 16px 60px;}
+.panel-admin{background:linear-gradient(135deg,#0D0D0D 0%,#1A1A2E 100%);border:1.5px solid var(--oro);border-radius:12px;padding:24px;margin-bottom:32px;}
+.panel-titulo{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.panel-titulo h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.2em;color:var(--oro);text-transform:uppercase;}
+.badge-admin{background:var(--oro);color:var(--negro);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.65rem;letter-spacing:.12em;padding:4px 10px;border-radius:20px;text-transform:uppercase;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.campo-grupo{display:flex;flex-direction:column;gap:4px;}
+.campo-grupo label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.12em;color:var(--gris-med);text-transform:uppercase;}
+.campo-grupo input{background:#0D0D0D;border:1px solid #3A3430;border-radius:6px;padding:10px 12px;color:var(--crema);font-family:'Barlow',sans-serif;font-size:.88rem;width:100%;transition:border-color .2s;}
+.campo-grupo input:focus{outline:none;border-color:var(--oro);}
+.monto-preview{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;color:var(--oro-claro);margin-top:4px;min-height:18px;}
+.tl-row{display:grid;grid-template-columns:140px 1fr;gap:8px;margin-top:6px;}
+.sec-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.12em;color:var(--gris-med);text-transform:uppercase;margin:16px 0 8px;}
+.btn-generar{width:100%;margin-top:20px;background:linear-gradient(135deg,var(--oro),var(--oro-claro));color:var(--negro);border:none;padding:15px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;}
+.contrato-doc{background:var(--crema);border-radius:10px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+.contrato-header{background:var(--negro);padding:40px 48px 32px;text-align:center;}
+.banda-nombre{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.35em;color:var(--oro);text-transform:uppercase;margin-bottom:20px;}
+.contrato-titulo{font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:1.7rem;color:var(--crema);line-height:1.2;}
+.oro-divider{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0 0;}
+.oro-divider::before,.oro-divider::after{content:'';flex:1;max-width:80px;height:1px;background:var(--oro);}
+.contrato-body{padding:32px 40px;}
+.sec-titulo{display:flex;align-items:center;gap:10px;background:var(--negro);padding:10px 16px;border-radius:6px;margin:24px 0 12px;}
+.sec-titulo span{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.2em;color:var(--oro);text-transform:uppercase;}
+.comparecientes{background:#fff;border-radius:8px;padding:20px 24px;margin-bottom:8px;}
+.comparecientes p{font-size:.9rem;line-height:1.7;color:var(--gris-osc);}
+.comparecientes p+p{margin-top:10px;}
+.dato{font-weight:700;color:var(--negro);}
+.clausula{margin-bottom:20px;}
+.clausula-titulo{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #D4CFC8;padding-bottom:6px;margin-bottom:10px;}
+.clausula-titulo h4{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.15em;color:var(--gris-osc);text-transform:uppercase;}
+.clausula-num{font-family:'Playfair Display',serif;font-weight:700;font-size:1.1rem;color:var(--oro);opacity:.6;}
+.clausula p{font-size:.88rem;line-height:1.75;color:#3A3430;}
+.tl-item{display:flex;gap:16px;align-items:flex-start;padding:8px 12px;background:#fff;border-radius:6px;margin-bottom:6px;}
+.tl-hora{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;color:#fff;background:var(--gris-osc);padding:4px 10px;border-radius:4px;white-space:nowrap;min-width:90px;text-align:center;}
+.tl-desc{font-size:.85rem;color:#3A3430;line-height:1.5;}
+.transferencia{background:#fff;border-radius:8px;padding:16px 20px;margin-top:10px;}
+.transferencia table{width:100%;border-collapse:collapse;font-size:.85rem;}
+.transferencia td{padding:5px 8px;border-bottom:1px solid #EAE5DC;color:#3A3430;}
+.transferencia td:first-child{font-weight:700;color:var(--negro);width:110px;}
+.transferencia tr:last-child td{border-bottom:none;}
+.nota-transf{font-size:.8rem;color:var(--gris-med);margin-top:8px;font-style:italic;}
+.zona-firma{background:#fff;border-radius:8px;padding:20px 24px;margin:16px 0;}
+.zona-firma h4{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.12em;color:var(--gris-med);text-transform:uppercase;margin-bottom:10px;}
+canvas#firma-canvas{display:block;width:100%;height:96px;cursor:crosshair;touch-action:none;background:#F9F7F4;border:1.5px dashed #C9C4BC;border-radius:6px;}
+.firma-hint{font-size:.68rem;color:var(--gris-med);text-align:center;margin-top:6px;}
+.btn-borrar{background:transparent;border:1px solid #C9C4BC;color:var(--gris-med);padding:5px 14px;border-radius:5px;font-size:.75rem;cursor:pointer;margin-top:6px;}
+.carnet-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+.carnet-box{display:flex;flex-direction:column;gap:4px;}
+.carnet-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.1em;color:var(--gris-med);text-transform:uppercase;}
+.carnet-area{position:relative;background:#F9F7F4;border:1.5px dashed #C9C4BC;border-radius:8px;overflow:hidden;cursor:pointer;aspect-ratio:1.58;}
+.carnet-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.carnet-prev{width:100%;height:100%;object-fit:cover;display:none;}
+.carnet-icon{font-size:2rem;text-align:center;padding-top:14px;}
+.carnet-hint-txt{font-size:.68rem;color:var(--gris-med);text-align:center;padding:4px 8px;}
+.carnet-est{font-size:.72rem;color:var(--gris-med);min-height:16px;}
+.carnet-est.ok{color:#4ade80;}
+.carnet-est.err{color:#f87171;}
+.campo-err{display:none;font-size:.7rem;color:#f87171;}
+.decl-box{background:#1A1A2E;border:1.5px solid var(--oro);border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;align-items:flex-start;gap:12px;}
+.decl-box input[type=checkbox]{width:20px;height:20px;margin-top:2px;accent-color:var(--oro);flex-shrink:0;cursor:pointer;}
+.decl-box label{font-size:.82rem;line-height:1.6;color:var(--crema);cursor:pointer;}
+.btn-enviar{width:100%;padding:16px;background:linear-gradient(135deg,var(--oro),var(--oro-claro));color:var(--negro);border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;margin-top:8px;}
+.btn-enviar:disabled{opacity:.4;cursor:not-allowed;}
+.btn-movil{display:none;width:100%;padding:14px;background:var(--negro);color:var(--oro);border:1.5px solid var(--oro);border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.12em;cursor:pointer;text-transform:uppercase;margin-top:10px;}
+.exito{display:none;background:#0D2A1A;border:1.5px solid #4ade80;border-radius:8px;padding:16px 20px;margin-top:12px;text-align:center;}
+.exito p{color:#4ade80;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.08em;}
+.contrato-footer{background:var(--negro);padding:16px 40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.contrato-footer span{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:.1em;color:var(--gris-med);text-transform:uppercase;}
+@media(max-width:600px){.grid-2,.carnet-grid{grid-template-columns:1fr;}.contrato-body{padding:20px 16px;}.tl-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="contrato-wrap">
+
+<!-- PANEL ADMIN -->
+<div id="panel-admin" class="panel-admin">
+  <div class="panel-titulo">
+    <h2>&#9881; Estacion Base &mdash; Datos del Contrato</h2>
+    <span class="badge-admin">&#10022; Modo Administrador</span>
+  </div>
+  <div class="grid-2">
+    <div class="campo-grupo"><label>Nombre completo *</label><input type="text" id="a-nombre" placeholder="Ej: Carlos Villarroel" oninput="sync()"></div>
+    <div class="campo-grupo"><label>RUT del cliente *</label><input type="text" id="a-rut" placeholder="12.345.678-9" oninput="sync();fmtRUT(this)"></div>
+    <div class="campo-grupo"><label>Direccion *</label><input type="text" id="a-dir" placeholder="Calle, ciudad" oninput="sync()"></div>
+    <div class="campo-grupo"><label>Telefono *</label><input type="text" id="a-tel" placeholder="+56 9 XXXX XXXX" oninput="sync()"></div>
+    <div class="campo-grupo"><label>Correo electronico *</label><input type="email" id="a-email" placeholder="correo@ejemplo.com" oninput="sync()"></div>
+    <div class="campo-grupo"><label>Fecha del evento *</label><input type="text" id="a-fecha-ev" placeholder="Sabado 21 de marzo de 2026" oninput="sync()"></div>
+    <div class="campo-grupo"><label>Lugar del evento *</label><input type="text" id="a-lugar" placeholder="Nombre del lugar, ciudad" oninput="sync()"></div>
+    <div class="campo-grupo"><label>Monto total (CLP) *</label><input type="text" id="a-monto" placeholder="850000" oninput="calcMonto();sync()"><div class="monto-preview" id="monto-preview">$ &mdash;</div></div>
+  </div>
+  <div class="sec-label">Planificacion / Timeline</div>
+  <div class="tl-row"><input type="text" id="a-h1" placeholder="18:30 hrs" oninput="sync()" style="background:#0D0D0D;border:1px solid #3A3430;border-radius:6px;padding:10px 12px;color:var(--crema);font-size:.88rem;"><input type="text" id="a-d1" placeholder="Llegada de la banda y montaje" oninput="sync()" style="background:#0D0D0D;border:1px solid #3A3430;border-radius:6px;padding:10px 12px;color:var(--crema);font-size:.88rem;"></div>
+  <div class="tl-row"><input type="text" id="a-h2" placeholder="19:00 - 20:00 hrs" oninput="sync()" style="background:#0D0D0D;border:1px solid #3A3430;border-radius:6px;padding:10px 12px;color:var(--crema);font-size:.88rem;"><input type="text" id="a-d2" placeholder="Pruebas de Sonido (Soundcheck)" oninput="sync()" style="background:#0D0D0D;border:1px solid #3A3430;border-radius:6px;padding:10px 12px;color:var(--crema);font-size:.88rem;"></div>
+  <div class="tl-row"><input type="text" id="a-h3" placeholder="21:30 hrs" oninput="sync()" style="background:#0D0D0D;border:1px solid #3A3430;border-radius:6px;padding:10px 12px;color:var(--crema);font-size:.88rem;"><input type="text" id="a-d3" placeholder="Inicio del Show (90 minutos)" oninput="sync()" style="background:#0D0D0D;border:1px solid #3A3430;border-radius:6px;padding:10px 12px;color:var(--crema);font-size:.88rem;"></div>
+  <button class="btn-generar" onclick="generarLink()">&#128279; GENERAR LINK PARA EL CLIENTE</button>
+</div>
+
+<!-- MODAL LINK -->
+<div id="modal-link" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1A1A2E;border:2px solid #C9A84C;border-radius:12px;padding:28px 32px;max-width:560px;width:92%;margin:20px auto;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.15em;color:#C9A84C;text-transform:uppercase;margin-bottom:12px;">&#128279; Link del Cliente Generado</div>
+    <div style="font-size:.75rem;color:#8A8480;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Copie y envie al cliente por WhatsApp o correo:</div>
+    <textarea id="modal-link-texto" readonly onclick="this.select()" style="width:100%;height:90px;background:#0D0D0D;color:#E8CC7A;border:1.5px solid #C9A84C;border-radius:6px;padding:10px;font-family:monospace;font-size:.72rem;resize:none;word-break:break-all;box-sizing:border-box;"></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button onclick="copiarModalLink()" style="flex:1;background:#C9A84C;color:#0D0D0D;border:none;padding:13px;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;">&#128203; COPIAR LINK</button>
+      <button onclick="document.getElementById('modal-link').style.display='none'" style="flex:1;background:transparent;color:#8A8480;border:1px solid #8A8480;padding:13px;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;">CERRAR</button>
+    </div>
+    <div id="modal-aviso" style="display:none;text-align:center;color:#4ade80;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.08em;margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- CONTRATO -->
+<div class="contrato-doc">
+  <div class="contrato-header">
+    <div class="banda-nombre">Kontrabanda</div>
+    <div class="contrato-titulo">CONTRATO DE PRESTACION<br>DE SERVICIOS MUSICALES</div>
+    <div class="oro-divider"><span style="color:#C9A84C;">&#9670;</span></div>
+  </div>
+  <div class="contrato-body">
+
+    <div class="sec-titulo"><span>&#9670;</span><span>I. Comparecientes</span></div>
+    <div class="comparecientes">
+      <p><strong>PRESTADOR:</strong> KONTRABANDA, representada legalmente por Don <strong>Jose Luis Figueroa</strong>,<br>RUT <strong>12.622.876-7</strong>, con domicilio en Maturana 961, Valparaiso (en adelante, <em>"LA BANDA"</em>).</p>
+      <p><strong>CONTRATANTE:</strong> Don/Dona <span class="dato" id="t-nombre">[ Nombre del Cliente ]</span>, RUT <span class="dato" id="t-rut">[ RUT ]</span>, con domicilio en <span class="dato" id="t-dir">[ Direccion ]</span>, telefono <span class="dato" id="t-tel">[ Telefono ]</span>, correo <span class="dato" id="t-email">[ Correo ]</span> (en adelante, <em>"EL CLIENTE"</em>).</p>
+    </div>
+
+    <div class="sec-titulo"><span>&#9670;</span><span>II. Clausulas Contractuales</span></div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Primera &mdash; Objeto y Duracion del Servicio</h4><span class="clausula-num">I</span></div>
+      <p>LA BANDA se compromete a realizar una presentacion musical en vivo para el evento de EL CLIENTE el dia <strong><span id="t-fecha-ev">[ Fecha del Evento ]</span></strong>, en el lugar denominado <strong><span id="t-lugar">[ Lugar del Evento ]</span></strong>. La duracion del espectaculo sera de <strong>90 minutos</strong> de ejecucion efectiva.</p>
+    </div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Segunda &mdash; Planificacion Logistica (Timeline)</h4><span class="clausula-num">II</span></div>
+      <p>Para asegurar la excelencia tecnica, se establecen los siguientes hitos horarios:</p>
+      <div style="margin-top:10px;">
+        <div class="tl-item"><div class="tl-hora" id="t-h1">18:30 hrs</div><div class="tl-desc" id="t-d1">Arribo del equipo tecnico y montaje de infraestructura.</div></div>
+        <div class="tl-item"><div class="tl-hora" id="t-h2">19:00 hrs</div><div class="tl-desc" id="t-d2">Inicio de prueba de sonido (Soundcheck).</div></div>
+        <div class="tl-item"><div class="tl-hora" id="t-h3">21:30 hrs</div><div class="tl-desc" id="t-d3">Inicio de la presentacion musical.</div></div>
+      </div>
+    </div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Tercera &mdash; Obligaciones Tecnicas y Logisticas</h4><span class="clausula-num">III</span></div>
+      <p>LA BANDA proporcionara el sistema de sonorizacion, microfonia y personal tecnico calificado. EL CLIENTE asume la responsabilidad de facilitar el acceso al recinto con la debida antelacion, garantizar condiciones de seguridad adecuadas, y disponer de conexion electrica estable de 220V con al menos dos enchufes de 16A disponibles para el equipo tecnico.</p>
+    </div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Cuarta &mdash; Condiciones Economicas y Anticipo</h4><span class="clausula-num">IV</span></div>
+      <p>El monto total acordado por la prestacion de servicios es de <strong>$ <span id="t-monto">[ Monto ]</span> (CLP)</strong>. El pago se estructura en dos cuotas: un anticipo del <strong>50% ($ <span id="t-anticipo">&#8212;</span>)</strong> al momento de la firma del presente contrato, y el saldo restante del <strong>50% ($ <span id="t-saldo">&#8212;</span>)</strong> a cancelar en la fecha del evento, antes del inicio del servicio.</p>
+    </div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Quinta &mdash; Datos de Transferencia</h4><span class="clausula-num">V</span></div>
+      <div class="transferencia">
+        <table>
+          <tr><td>Titular</td><td>Jose Luis Figueroa</td></tr>
+          <tr><td>RUT</td><td>12.622.876-7</td></tr>
+          <tr><td>Banco</td><td>Santander</td></tr>
+          <tr><td>Tipo Cuenta</td><td>Cuenta Corriente</td></tr>
+          <tr><td>N Cuenta</td><td>62547960</td></tr>
+          <tr><td>Correo</td><td>kontrabandaoficialchile [arroba] gmail.com</td></tr>
+        </table>
+      </div>
+      <p class="nota-transf">Enviada la transferencia, EL CLIENTE debera remitir el comprobante al correo o via WhatsApp al numero de contacto de la administracion.</p>
+    </div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Sexta &mdash; Cancelacion y Penalidades</h4><span class="clausula-num">VI</span></div>
+      <p>En caso de cancelacion por parte de EL CLIENTE con menos de <strong>7 dias</strong> de anticipacion a la fecha del evento, el anticipo pagado no sera reembolsable. LA BANDA se reserva el derecho de rescindir el contrato sin penalidad en caso de fuerza mayor debidamente justificada.</p>
+    </div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Septima &mdash; Propiedad Intelectual y Uso de Imagen</h4><span class="clausula-num">VII</span></div>
+      <p>EL CLIENTE autoriza a LA BANDA a fotografiar y/o grabar fragmentos del evento con fines de difusion artistica en redes sociales y plataformas digitales. Queda expresamente prohibida la grabacion y distribucion comercial del show sin autorizacion escrita de LA BANDA.</p>
+    </div>
+
+    <div class="clausula">
+      <div class="clausula-titulo"><h4>Octava &mdash; Jurisdiccion y Aceptacion</h4><span class="clausula-num">VIII</span></div>
+      <p>Las partes acuerdan que cualquier controversia derivada del presente contrato sera resuelta de buena fe y, en caso necesario, sometida a la jurisdiccion de los tribunales ordinarios de Valparaiso. La firma electronica o digital del presente instrumento tendra plena validez legal.</p>
+    </div>
+
+    <!-- ZONA CLIENTE -->
+    <div id="zona-cliente" style="display:none;">
+      <div class="zona-firma">
+        <h4>Fotografia del Carnet de Identidad</h4>
+        <div class="carnet-grid">
+          <div class="carnet-box">
+            <div class="carnet-label">Cara Frontal *</div>
+            <div class="carnet-area" id="area-frontal">
+              <input type="file" accept="image/*" capture="environment" onchange="subirCarnet(this,'frontal')">
+              <img id="prev-frontal" class="carnet-prev" alt="Frontal">
+              <div id="icon-frontal"><div class="carnet-icon">&#129354;</div><div class="carnet-hint-txt">Toque para fotografiar</div></div>
+            </div>
+            <div class="carnet-est" id="est-frontal"></div>
+            <span class="campo-err" id="err-frontal">Suba la cara frontal del carnet</span>
+          </div>
+          <div class="carnet-box">
+            <div class="carnet-label">Cara Posterior *</div>
+            <div class="carnet-area" id="area-posterior">
+              <input type="file" accept="image/*" capture="environment" onchange="subirCarnet(this,'posterior')">
+              <img id="prev-posterior" class="carnet-prev" alt="Posterior">
+              <div id="icon-posterior"><div class="carnet-icon">&#129354;</div><div class="carnet-hint-txt">Toque para fotografiar</div></div>
+            </div>
+            <div class="carnet-est" id="est-posterior"></div>
+            <span class="campo-err" id="err-posterior">Suba la cara posterior del carnet</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="zona-firma">
+        <h4>Firma del Cliente</h4>
+        <canvas id="firma-canvas" width="680" height="96"></canvas>
+        <div class="firma-hint">Firme con el dedo o el mouse en el area de arriba</div>
+        <button class="btn-borrar" onclick="borrarFirma()">&#10005; Borrar firma</button>
+        <span class="campo-err" id="err-firma">La firma es obligatoria</span>
+      </div>
+
+      <div class="decl-box">
+        <input type="checkbox" id="chk-leido" onchange="toggleEnviar()">
+        <label for="chk-leido">Declaro haber leido, comprendido y aceptado en su totalidad los terminos y condiciones del presente Contrato de Prestacion de Servicios Musicales, y reconozco que mi firma digital tiene plena validez legal.</label>
+      </div>
+
+      <button class="btn-enviar" id="btn-enviar" disabled onclick="generar()">&#9996; Firmar y Generar Contrato PDF</button>
+      <button class="btn-movil" id="btn-movil" onclick="descMovil()">&#8681; Descargar PDF</button>
+
+      <div class="exito" id="exito-box">
+        <p>&#10003; Contrato generado correctamente!<br>El PDF ha sido descargado. Envie una copia al correo de la administracion.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="contrato-footer">
+    <span>KONTRABANDA &mdash; Servicios Musicales</span>
+    <span>kontrabandaoficialchile [arroba] gmail.com</span>
+  </div>
+</div>
+
+</div>
+<script data-cfasync="false">
+var canvas, ctx, dibujando = false, firmaVacia = true;
+var carnetURLs = { frontal: null, posterior: null };
+
+// INIT
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  if (p.has('nombre') || p.has('n')) {
+    document.getElementById('panel-admin').style.display = 'none';
+    document.getElementById('zona-cliente').style.display = 'block';
+    cargarDatos(p);
+    initFirma();
+  }
+})();
+
+function cargarDatos(p) {
+  var g = function(a,b){ return p.get(a)||p.get(b)||''; };
+  var nombre  = g('nombre','n');
+  var rut     = g('rut','r');
+  var dir     = g('dir','d');
+  var tel     = g('tel','t');
+  var email   = g('email','e');
+  var fechaev = g('fechaev','f');
+  var lugar   = g('lugar','l');
+  var monto   = g('monto','m');
+  var h1=g('h1','h1')||'18:30 hrs', d1=g('d1','d1')||'Arribo del equipo tecnico y montaje.';
+  var h2=g('h2','h2')||'19:00 hrs', d2=g('d2','d2')||'Inicio de prueba de sonido (Soundcheck).';
+  var h3=g('h3','h3')||'21:30 hrs', d3=g('d3','d3')||'Inicio de la presentacion musical.';
+
+  function s(id,v){ var el=document.getElementById(id); if(el&&v) el.textContent=v; }
+  s('t-nombre', nombre); s('t-rut', rut); s('t-dir', dir);
+  s('t-tel', tel); s('t-email', email); s('t-fecha-ev', fechaev);
+  s('t-lugar', lugar);
+  s('t-h1',h1); s('t-d1',d1); s('t-h2',h2); s('t-d2',d2); s('t-h3',h3); s('t-d3',d3);
+
+  if (monto) {
+    var num = parseInt(monto.replace(/\D/g,''), 10);
+    if (!isNaN(num) && num > 0) {
+      s('t-monto', num.toLocaleString('es-CL'));
+      var mit = Math.round(num/2);
+      s('t-anticipo', mit.toLocaleString('es-CL'));
+      s('t-saldo',    mit.toLocaleString('es-CL'));
+    }
+  }
+}
+
+function sync() {
+  function v(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+  function s(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+  s('t-nombre',  v('a-nombre')||'[ Nombre del Cliente ]');
+  s('t-rut',     v('a-rut')||'[ RUT ]');
+  s('t-dir',     v('a-dir')||'[ Direccion ]');
+  s('t-tel',     v('a-tel')||'[ Telefono ]');
+  s('t-email',   v('a-email')||'[ Correo ]');
+  s('t-fecha-ev',v('a-fecha-ev')||'[ Fecha del Evento ]');
+  s('t-lugar',   v('a-lugar')||'[ Lugar del Evento ]');
+  s('t-h1',v('a-h1')||'18:30 hrs'); s('t-d1',v('a-d1')||'Arribo del equipo tecnico y montaje.');
+  s('t-h2',v('a-h2')||'19:00 hrs'); s('t-d2',v('a-d2')||'Inicio de prueba de sonido (Soundcheck).');
+  s('t-h3',v('a-h3')||'21:30 hrs'); s('t-d3',v('a-d3')||'Inicio de la presentacion musical.');
+}
+
+function calcMonto() {
+  var el=document.getElementById('a-monto'), prev=document.getElementById('monto-preview');
+  if(!el||!prev) return;
+  var raw=el.value.replace(/\./g,'').replace(/[^\d]/g,'');
+  var num=parseInt(raw,10);
+  if(!isNaN(num)&&num>0){
+    el.value=num.toLocaleString('es-CL');
+    var mit=Math.round(num/2);
+    prev.textContent='$ '+num.toLocaleString('es-CL')+' | 50%: $ '+mit.toLocaleString('es-CL');
+    document.getElementById('t-monto').textContent=num.toLocaleString('es-CL');
+    document.getElementById('t-anticipo').textContent=mit.toLocaleString('es-CL');
+    document.getElementById('t-saldo').textContent=mit.toLocaleString('es-CL');
+  } else { prev.textContent='$ \u2014'; }
+}
+
+function fmtRUT(inp) {
+  var v=inp.value.replace(/[^0-9kK]/g,'');
+  if(v.length>1){
+    var cu=v.slice(0,-1), dv=v.slice(-1).toUpperCase(), fmt='';
+    while(cu.length>3){ fmt='.'+cu.slice(-3)+fmt; cu=cu.slice(0,-3); }
+    inp.value=cu+fmt+'-'+dv;
+  }
+}
+
+function generarLink() {
+  function gv(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+  var nombre=gv('a-nombre'), monto=gv('a-monto');
+  var modal=document.getElementById('modal-link');
+  var ta=document.getElementById('modal-link-texto');
+
+  if(!nombre||!monto){
+    ta.value='ADVERTENCIA: Complete al menos Nombre y Monto antes de generar el link.';
+    modal.style.display='flex';
+    return;
+  }
+
+  var raw=monto.replace(/\./g,'').replace(/[^\d]/g,'');
+  var p={
+    nombre:nombre, rut:gv('a-rut'), dir:gv('a-dir'), tel:gv('a-tel'),
+    email:gv('a-email'), fechaev:gv('a-fecha-ev'), lugar:gv('a-lugar'), monto:raw,
+    h1:gv('a-h1')||'18:30 hrs', d1:gv('a-d1')||'Arribo del equipo tecnico y montaje.',
+    h2:gv('a-h2')||'19:00 hrs', d2:gv('a-d2')||'Inicio de prueba de sonido (Soundcheck).',
+    h3:gv('a-h3')||'21:30 hrs', d3:gv('a-d3')||'Inicio de la presentacion musical.'
+  };
+  var qs=Object.keys(p).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(p[k]);}).join('&');
+  var link='https://kontrabandaoficial.github.io/contrato.html?'+qs;
+
+  ta.value=link;
+  document.getElementById('modal-aviso').style.display='none';
+  modal.style.display='flex';
+
+  setTimeout(function(){
+    ta.select(); ta.setSelectionRange(0,99999);
+    try{ document.execCommand('copy'); }catch(e){}
+    if(navigator.clipboard&&window.isSecureContext){
+      navigator.clipboard.writeText(link).then(function(){
+        var av=document.getElementById('modal-aviso');
+        av.textContent='\u2714 Copiado automaticamente \u2014 pegue con Ctrl+V';
+        av.style.display='block';
+      }).catch(function(){});
+    }
+  },150);
+}
+
+function copiarModalLink() {
+  var ta=document.getElementById('modal-link-texto');
+  ta.select(); ta.setSelectionRange(0,99999);
+  var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+  if(!ok&&navigator.clipboard) navigator.clipboard.writeText(ta.value).catch(function(){});
+  var av=document.getElementById('modal-aviso');
+  av.textContent='\u2714 Link copiado \u2014 pegue con Ctrl+V en WhatsApp';
+  av.style.display='block';
+}
+
+function initFirma() {
+  canvas=document.getElementById('firma-canvas');
+  if(!canvas) return;
+  ctx=canvas.getContext('2d');
+  var w=canvas.parentElement.offsetWidth-48;
+  canvas.width=w>0?w:300; canvas.height=96;
+  ctx.strokeStyle='#1A1A2E'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineJoin='round';
+
+  function getPos(e){ var r=canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*(canvas.width/r.width), y:(e.clientY-r.top)*(canvas.height/r.height)}; }
+  canvas.addEventListener('mousedown', function(e){ dibujando=true; firmaVacia=false; ctx.beginPath(); var p=getPos(e); ctx.moveTo(p.x,p.y); });
+  canvas.addEventListener('mousemove', function(e){ if(!dibujando) return; var p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); });
+  canvas.addEventListener('mouseup',   function(){ dibujando=false; });
+  canvas.addEventListener('mouseleave',function(){ dibujando=false; });
+  canvas.addEventListener('touchstart',function(e){ e.preventDefault(); dibujando=true; firmaVacia=false; ctx.beginPath(); var t=e.touches[0],r=canvas.getBoundingClientRect(); ctx.moveTo((t.clientX-r.left)*(canvas.width/r.width),(t.clientY-r.top)*(canvas.height/r.height)); },{passive:false});
+  canvas.addEventListener('touchmove', function(e){ e.preventDefault(); if(!dibujando) return; var t=e.touches[0],r=canvas.getBoundingClientRect(); ctx.lineTo((t.clientX-r.left)*(canvas.width/r.width),(t.clientY-r.top)*(canvas.height/r.height)); ctx.stroke(); },{passive:false});
+  canvas.addEventListener('touchend',  function(e){ e.preventDefault(); dibujando=false; },{passive:false});
+}
+
+function borrarFirma() {
+  if(ctx) ctx.clearRect(0,0,canvas.width,canvas.height);
+  firmaVacia=true;
+}
+
+function toggleEnviar() {
+  var chk=document.getElementById('chk-leido'), btn=document.getElementById('btn-enviar');
+  if(chk&&btn) btn.disabled=!chk.checked;
+}
+
+function subirCarnet(input, lado) {
+  if(!input.files||!input.files[0]) return;
+  var file=input.files[0];
+  var est=document.getElementById('est-'+lado);
+  var prev=document.getElementById('prev-'+lado);
+  var icon=document.getElementById('icon-'+lado);
+  est.textContent='Subiendo...'; est.className='carnet-est';
+  var img=new Image();
+  img.onload=function(){
+    var maxW=1200, ratio=Math.min(maxW/img.width,maxW/img.height,1);
+    var cvs=document.createElement('canvas');
+    cvs.width=img.width*ratio; cvs.height=img.height*ratio;
+    cvs.getContext('2d').drawImage(img,0,0,cvs.width,cvs.height);
+    cvs.toBlob(function(blob){
+      var fd=new FormData();
+      fd.append('file',blob,file.name);
+      fd.append('upload_preset','nic1mwjn');
+      fd.append('folder','contratos_carnets');
+      fetch('https://api.cloudinary.com/v1_1/drwewbgta/image/upload',{method:'POST',body:fd})
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if(data.secure_url){
+            carnetURLs[lado]=data.secure_url;
+            if(prev){ prev.src=data.secure_url; prev.style.display='block'; }
+            if(icon) icon.style.display='none';
+            est.textContent='\u2713 Subido correctamente'; est.className='carnet-est ok';
+            document.getElementById('err-'+lado).style.display='none';
+          } else { est.textContent='Error al subir'; est.className='carnet-est err'; }
+        })
+        .catch(function(){ est.textContent='Error de conexion'; est.className='carnet-est err'; });
+    },'image/jpeg',0.82);
+  };
+  img.src=URL.createObjectURL(file);
+}
+
+function generar() {
+  var ok=true;
+  if(!carnetURLs.frontal){ document.getElementById('err-frontal').style.display='block'; ok=false; }
+  if(!carnetURLs.posterior){ document.getElementById('err-posterior').style.display='block'; ok=false; }
+  if(firmaVacia){ document.getElementById('err-firma').style.display='block'; ok=false; }
+  if(!ok) return;
+  var firmaImg=canvas.toDataURL('image/png');
+  buildPDF(getDatos(), firmaImg);
+  document.getElementById('exito-box').style.display='block';
+  document.getElementById('btn-movil').style.display='block';
+}
+
+function descMovil() {
+  var firmaImg=canvas.toDataURL('image/png');
+  buildPDF(getDatos(), firmaImg);
+}
+
+function getDatos() {
+  function gt(id){ var el=document.getElementById(id); return el?el.textContent.trim():''; }
+  return {
+    nombre:gt('t-nombre'), rut:gt('t-rut'), dir:gt('t-dir'), tel:gt('t-tel'),
+    email:gt('t-email'), fechaev:gt('t-fecha-ev'), lugar:gt('t-lugar'),
+    monto:gt('t-monto'), anticipo:gt('t-anticipo'), saldo:gt('t-saldo'),
+    h1:gt('t-h1'), d1:gt('t-d1'), h2:gt('t-h2'), d2:gt('t-d2'), h3:gt('t-h3'), d3:gt('t-d3')
+  };
+}
+
+function buildPDF(d, firmaImg) {
+  var jsPDF=window.jspdf.jsPDF;
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var pw=210, ph=297, mg=18, lw=pw-mg*2, y=mg;
+
+  function chk(ex){ if(y+ex>ph-mg){ doc.addPage(); y=mg; } }
+  function sec(t){ chk(10); doc.setFillColor(13,13,13); doc.rect(mg,y,lw,7,'F'); doc.setTextColor(201,168,76); doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text(t,mg+3,y+5); y+=10; }
+  function ctit(n,t){ chk(8); doc.setTextColor(13,13,13); doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.text(n+' - '+t.toUpperCase(),mg,y); doc.setDrawColor(201,168,76); doc.setLineWidth(0.4); doc.line(mg,y+1,pw-mg,y+1); y+=6; }
+  function par(txt){ doc.setTextColor(42,36,32); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.splitTextToSize(txt,lw).forEach(function(l){ chk(5); doc.text(l,mg,y); y+=4.5; }); y+=2; }
+  function itm(t,v){ chk(5); doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(13,13,13); doc.text('- '+t+': ',mg+2,y); var tw=doc.getTextWidth('- '+t+': '); doc.setFont('helvetica','normal'); doc.setTextColor(42,36,32); doc.splitTextToSize(v,lw-tw-4).forEach(function(l,i){ if(i>0){y+=4.5;} doc.text(l,mg+2+tw,y); }); y+=4.5; }
+
+  doc.setFillColor(13,13,13); doc.rect(0,0,pw,36,'F');
+  doc.setTextColor(201,168,76); doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('KONTRABANDA',pw/2,12,{align:'center'});
+  doc.setFontSize(13); doc.text('CONTRATO DE PRESTACION DE SERVICIOS MUSICALES',pw/2,22,{align:'center'});
+  doc.setFontSize(7); doc.setTextColor(138,132,128); doc.text('kontrabandaoficialchile@gmail.com  |  Maturana 961, Valparaiso',pw/2,31,{align:'center'});
+  y=44;
+
+  sec('I. COMPARECIENTES');
+  par('PRESTADOR: KONTRABANDA, representada por Don Jose Luis Figueroa. RUT 12.622.876-7. Maturana 961, Valparaiso (LA BANDA).');
+  par('CONTRATANTE: '+d.nombre+', RUT '+d.rut+', domicilio en '+d.dir+', telefono '+d.tel+', correo '+d.email+' (EL CLIENTE).');
+  sec('II. CLAUSULAS');
+  ctit('PRIMERA','Objeto y Duracion'); par('LA BANDA realizara presentacion musical el '+d.fechaev+' en '+d.lugar+'. Duracion: 90 minutos efectivos.');
+  ctit('SEGUNDA','Timeline'); itm(d.h1,d.d1); itm(d.h2,d.d2); itm(d.h3,d.d3);
+  ctit('TERCERA','Obligaciones Tecnicas'); par('LA BANDA provee sonido, microfonia y tecnicos. EL CLIENTE garantiza acceso anticipado, seguridad y conexion electrica 220V.');
+  ctit('CUARTA','Condiciones Economicas'); par('Monto total: $'+d.monto+' CLP. Anticipo 50%: $'+d.anticipo+'. Saldo 50%: $'+d.saldo+' (dia del evento).');
+  ctit('QUINTA','Transferencia'); par('Jose Luis Figueroa | RUT 12.622.876-7 | Banco Santander | Cta. Cte. N 62547960'); par('Enviar comprobante al correo: kontrabandaoficialchile@gmail.com');
+  ctit('SEXTA','Cancelacion'); par('Cancelacion con menos de 7 dias: anticipo no reembolsable.');
+  ctit('SEPTIMA','Propiedad Intelectual'); par('EL CLIENTE autoriza fotografia y grabacion parcial del evento con fines de difusion artistica.');
+  ctit('OCTAVA','Jurisdiccion'); par('Controversias: tribunales ordinarios de Valparaiso. Firma digital con plena validez legal.');
+  sec('III. CARNET DE IDENTIDAD');
+  if(carnetURLs.frontal||carnetURLs.posterior){ if(carnetURLs.frontal) itm('Frontal',carnetURLs.frontal); if(carnetURLs.posterior) itm('Posterior',carnetURLs.posterior); } else { par('No se adjuntaron imagenes del carnet.'); }
+  sec('IV. FIRMA DEL CONTRATANTE');
+  chk(40); doc.setFillColor(245,240,232); doc.rect(mg,y,lw,36,'F'); doc.setDrawColor(201,168,76); doc.setLineWidth(0.5); doc.rect(mg,y,lw,36);
+  try{ doc.addImage(firmaImg,'PNG',mg+4,y+2,lw-8,32); }catch(e){}
+  y+=38;
+  var hoy=new Date(); var pad=function(n){return n<10?'0'+n:String(n);};
+  var fecha=pad(hoy.getDate())+'/'+pad(hoy.getMonth()+1)+'/'+hoy.getFullYear()+' '+pad(hoy.getHours())+':'+pad(hoy.getMinutes());
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(138,132,128);
+  doc.text('Firmado digitalmente el '+fecha+' - '+d.nombre+' (RUT '+d.rut+')',mg,y); y+=8;
+
+  var tp=doc.internal.getNumberOfPages();
+  for(var i=1;i<=tp;i++){ doc.setPage(i); doc.setFillColor(13,13,13); doc.rect(0,ph-12,pw,12,'F'); doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(138,132,128); doc.text('KONTRABANDA | Servicios Musicales | kontrabandaoficialchile@gmail.com',mg,ph-6); doc.text('Pagina '+i+'/'+tp,pw-mg,ph-6,{align:'right'}); }
+
+  doc.save('contrato_kontrabanda_'+d.nombre.replace(/\s+/g,'_').toLowerCase()+'.pdf');
+}
+</script>
+</body>
+</html>
