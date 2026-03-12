@@ -548,10 +548,17 @@ function calcMonto() {
 function generarLink() {
   var campos = ['a-nombre','a-rut','a-dir','a-tel','a-email','a-fecha-ev','a-lugar','a-monto'];
   var vacios = campos.filter(function(id){ return !v(id).trim(); });
-  if(vacios.length>0){ alert('Complete todos los campos antes de generar el link.'); return; }
+  if(vacios.length>0){
+    var box=document.getElementById('link-box');
+    box.style.display='block';
+    box.style.color='#FF6B6B';
+    box.textContent='⚠ Faltan campos: ' + vacios.join(', ');
+    return;
+  }
 
   var raw = v('a-monto').replace(/\./g,'').replace(/[^\d]/g,'');
-  var base = window.location.origin + window.location.pathname;
+  // URL base robusta para GitHub Pages
+  var base = 'https://kontrabandaoficial.github.io/contrato.html';
   var params = new URLSearchParams({
     nombre: v('a-nombre'),
     rut:    v('a-rut'),
@@ -569,6 +576,7 @@ function generarLink() {
 
   var box = document.getElementById('link-box');
   box.textContent = link;
+  box.style.color = 'var(--oro-claro)';
   box.style.display = 'block';
 
   // Copiar al portapapeles
