@@ -546,13 +546,12 @@ function calcMonto() {
 //  GENERAR LINK PARA CLIENTE
 // ══════════════════════════════════════════════
 function generarLink() {
-  var campos = ['a-nombre','a-rut','a-dir','a-tel','a-email','a-fecha-ev','a-lugar','a-monto'];
-  var vacios = campos.filter(function(id){ return !v(id).trim(); });
-  if(vacios.length>0){
-    var box=document.getElementById('link-box');
+  // Validación simple: solo nombre y monto son estrictamente requeridos
+  var box = document.getElementById('link-box');
+  if(!v('a-nombre').trim() || !v('a-monto').trim()){
     box.style.display='block';
     box.style.color='#FF6B6B';
-    box.textContent='⚠ Faltan campos: ' + vacios.join(', ');
+    box.textContent='⚠ Complete al menos Nombre y Monto para generar el link.';
     return;
   }
 
@@ -579,13 +578,26 @@ function generarLink() {
   box.style.color = 'var(--oro-claro)';
   box.style.display = 'block';
 
-  // Copiar al portapapeles
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(link).then(function(){
+  // Copiar al portapapeles — múltiples métodos para compatibilidad
+  try {
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(link).then(function(){
       var av = document.getElementById('aviso-copiado');
       av.style.display='block';
       setTimeout(function(){ av.style.display='none'; }, 3000);
     });
+    } else {
+      // Fallback: seleccionar el texto del box para copiar manualmente
+      var range = document.createRange();
+      range.selectNode(box);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      var av2 = document.getElementById('aviso-copiado');
+      av2.textContent = '✔ Seleccione el link de arriba y copie con Ctrl+C';
+      av2.style.display='block';
+    }
+  } catch(err) {
+    console.error('Error copiando:', err);
   }
 }
 
