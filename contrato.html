@@ -546,108 +546,64 @@ function calcMonto() {
 //  GENERAR LINK PARA CLIENTE
 // ══════════════════════════════════════════════
 function generarLink() {
-  // Validación simple: solo nombre y monto son estrictamente requeridos
-  var box = document.getElementById('link-box');
   if(!v('a-nombre').trim() || !v('a-monto').trim()){
-    box.style.display='block';
-    box.style.color='#FF6B6B';
-    box.textContent='⚠ Complete al menos Nombre y Monto para generar el link.';
+    document.getElementById('modal-link-texto').value = '';
+    var m = document.getElementById('modal-link');
+    m.style.display = 'flex';
+    document.getElementById('modal-link-texto').placeholder = '⚠ Complete al menos Nombre y Monto';
     return;
   }
-
   var raw = v('a-monto').replace(/\./g,'').replace(/[^\d]/g,'');
-  // URL base robusta para GitHub Pages
   var base = 'https://kontrabandaoficial.github.io/contrato.html';
   var params = new URLSearchParams({
-    nombre: v('a-nombre'),
-    rut:    v('a-rut'),
-    dir:    v('a-dir'),
-    tel:    v('a-tel'),
-    email:  v('a-email'),
+    nombre:  v('a-nombre'),
+    rut:     v('a-rut'),
+    dir:     v('a-dir'),
+    tel:     v('a-tel'),
+    email:   v('a-email'),
     fechaev: v('a-fecha-ev'),
-    lugar:  v('a-lugar'),
-    monto:  raw,
+    lugar:   v('a-lugar'),
+    monto:   raw,
     h1: v('a-h1')||'18:30 hrs', d1: v('a-d1')||'Arribo del equipo técnico y montaje de infraestructura.',
     h2: v('a-h2')||'19:00 hrs', d2: v('a-d2')||'Inicio de prueba de sonido (Soundcheck).',
     h3: v('a-h3')||'21:30 hrs', d3: v('a-d3')||'Inicio de la presentación musical.',
   });
   var link = base + '?' + params.toString();
 
+  // Mostrar modal con el link
+  document.getElementById('modal-link-texto').value = link;
+  document.getElementById('modal-aviso').style.display = 'none';
+  document.getElementById('modal-link').style.display = 'flex';
+
+  // También mostrar en el box inferior
   var box = document.getElementById('link-box');
   box.textContent = link;
   box.style.color = 'var(--oro-claro)';
   box.style.display = 'block';
 
-  // Copiar al portapapeles — múltiples métodos para compatibilidad
-  try {
-    if(navigator.clipboard && window.isSecureContext){
-      navigator.clipboard.writeText(link).then(function(){
-      var av = document.getElementById('aviso-copiado');
-      av.style.display='block';
-      setTimeout(function(){ av.style.display='none'; }, 3000);
-    });
-    } else {
-      // Fallback: seleccionar el texto del box para copiar manualmente
-      var range = document.createRange();
-      range.selectNode(box);
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
-      var av2 = document.getElementById('aviso-copiado');
-      av2.textContent = '✔ Seleccione el link de arriba y copie con Ctrl+C';
-      av2.style.display='block';
-    }
-  } catch(err) {
-    console.error('Error copiando:', err);
+  // Intentar copiar automático
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(link).then(function(){
+      document.getElementById('modal-aviso').textContent = '✔ Copiado automáticamente — péguelo en WhatsApp con Ctrl+V';
+      document.getElementById('modal-aviso').style.display = 'block';
+    }).catch(function(){ });
   }
 }
 
-// ══════════════════════════════════════════════
-//  SUBIDA CARNET CLOUDINARY
-// ══════════════════════════════════════════════
-async function subirCarnet(input, lado) {
-  var file = input.files[0];
-  if(!file) return;
-
-  var prev = document.getElementById('prev-'+lado);
-  var icon = document.getElementById('icon-'+lado);
-  var est  = document.getElementById('est-'+lado);
-  var err  = document.getElementById('err-'+lado);
-
-  // Preview inmediato
-  var reader = new FileReader();
-  reader.onload = function(e){ prev.src=e.target.result; prev.style.display='block'; icon.style.display='none'; };
-  reader.readAsDataURL(file);
-
-  est.textContent = '⏳ Subiendo imagen...';
-  est.className = 'carnet-estado cargando';
-  err.style.display = 'none';
-
-  var fd = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', UPLOAD_PRESET);
-  fd.append('cloud_name', CLOUD_NAME);
-
-  try {
-    var res = await fetch('https://api.cloudinary.com/v1_1/'+CLOUD_NAME+'/image/upload', { method:'POST', body:fd });
-    var data = await res.json();
-    if(data.secure_url){
-      carnetURLs[lado] = data.secure_url;
-      est.textContent = '✔ Imagen guardada correctamente';
-      est.className = 'carnet-estado ok';
-    } else {
-      throw new Error(JSON.stringify(data));
-    }
-  } catch(e) {
-    est.textContent = '✖ Error al subir. Intente nuevamente.';
-    est.className = 'carnet-estado error';
-    carnetURLs[lado] = null;
-    console.error('Cloudinary error ('+lado+'):', e);
+function copiarModal() {
+  var txt = document.getElementById('modal-link-texto');
+  txt.select();
+  txt.setSelectionRange(0, 99999);
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch(e) {}
+  if(!ok && navigator.clipboard){
+    navigator.clipboard.writeText(txt.value);
   }
+  document.getElementById('modal-aviso').textContent = '✔ Link copiado — péguelo en WhatsApp con Ctrl+V';
+  document.getElementById('modal-aviso').style.display = 'block';
 }
 
-// ══════════════════════════════════════════════
-//  CANVAS FIRMA
-// ══════════════════════════════════════════════
+
 function resizeCanvas(){
   var rect=canvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
   var img=null; try{ if(!firmaVacia) img=canvas.toDataURL(); }catch(e){}
