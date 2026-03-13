@@ -349,8 +349,8 @@ function generarLink() {
 
   var raw=monto.replace(/\./g,'').replace(/[^\d]/g,'');
   var p={
-    nombre:nombre, rut:gv('a-rut'), dir:gv('a-dir'), tel:gv('a-tel'),
-    email:gv('a-email'), fechaev:gv('a-fecha-ev'), lugar:gv('a-lugar'), monto:raw,
+    n:nombre, r:gv('a-rut'), d:gv('a-dir'), t:gv('a-tel'),
+    e:gv('a-email'), f:gv('a-fecha-ev'), l:gv('a-lugar'), m:raw,
     h1:gv('a-h1')||'18:30 hrs', d1:gv('a-d1')||'Arribo del equipo tecnico y montaje.',
     h2:gv('a-h2')||'19:00 hrs', d2:gv('a-d2')||'Inicio de prueba de sonido (Soundcheck).',
     h3:gv('a-h3')||'21:30 hrs', d3:gv('a-d3')||'Inicio de la presentacion musical.'
@@ -454,10 +454,82 @@ function generar() {
   if(!carnetURLs.posterior){ document.getElementById('err-posterior').style.display='block'; ok=false; }
   if(firmaVacia){ document.getElementById('err-firma').style.display='block'; ok=false; }
   if(!ok) return;
-  var firmaImg=canvas.toDataURL('image/png');
-  buildPDF(getDatos(), firmaImg);
-  document.getElementById('exito-box').style.display='block';
-  document.getElementById('btn-movil').style.display='block';
+
+  var btn=document.getElementById('btn-enviar');
+  btn.disabled=true; btn.textContent='Enviando contrato...';
+
+  var d=getDatos();
+  var firmaBlob=dataURLtoBlob(canvas.toDataURL('image/png'));
+  var fd=new FormData();
+  fd.append('file',firmaBlob,'firma.png');
+  fd.append('upload_preset','nic1mwjn');
+  fd.append('folder','contratos_firmas');
+
+  fetch('https://api.cloudinary.com/v1_1/drwewbgta/image/upload',{method:'POST',body:fd})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var firmaURL=data.secure_url||'No disponible';
+      var hoy=new Date();
+      var pad=function(n){return n<10?'0'+n:String(n);};
+      var fechaFirma=pad(hoy.getDate())+'/'+pad(hoy.getMonth()+1)+'/'+hoy.getFullYear()+' '+pad(hoy.getHours())+':'+pad(hoy.getMinutes());
+      var msg='============================\n';
+      msg+='CONTRATO FIRMADO - KONTRABANDA\n';
+      msg+='============================\n\n';
+      msg+='--- DATOS DEL CLIENTE ---\n';
+      msg+='Nombre: '+d.nombre+'\n';
+      msg+='RUT: '+d.rut+'\n';
+      msg+='Direccion: '+d.dir+'\n';
+      msg+='Telefono: '+d.tel+'\n';
+      msg+='Correo: '+d.email+'\n\n';
+      msg+='--- DATOS DEL EVENTO ---\n';
+      msg+='Fecha: '+d.fechaev+'\n';
+      msg+='Lugar: '+d.lugar+'\n';
+      msg+='Monto Total: $'+d.monto+' CLP\n';
+      msg+='Anticipo 50%: $'+d.anticipo+' CLP\n';
+      msg+='Saldo 50%: $'+d.saldo+' CLP\n\n';
+      msg+='--- TIMELINE ---\n';
+      msg+=d.h1+': '+d.d1+'\n';
+      msg+=d.h2+': '+d.d2+'\n';
+      msg+=d.h3+': '+d.d3+'\n\n';
+      msg+='--- FOTOS CARNET (ver links) ---\n';
+      msg+='Frontal: '+(carnetURLs.frontal||'No subida')+'\n';
+      msg+='Posterior: '+(carnetURLs.posterior||'No subida')+'\n\n';
+      msg+='--- FIRMA DEL CLIENTE ---\n';
+      msg+='Firma: '+firmaURL+'\n\n';
+      msg+='--- FECHA Y HORA DE FIRMA ---\n';
+      msg+=fechaFirma+'\n';
+      return fetch('https://api.web3forms.com/submit',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          access_key:'5a883ab3-106a-49d2-9efe-196cb268a12b',
+          subject:'Contrato Firmado KONTRABANDA - '+d.nombre+' - '+d.fechaev,
+          from_name:'Kontrabanda Contratos',
+          message:msg,
+          email:'kontrabandaoficialchile@gmail.com'
+        })
+      });
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(result){
+      buildPDF(getDatos(),canvas.toDataURL('image/png'));
+      document.getElementById('exito-box').style.display='block';
+      document.getElementById('btn-movil').style.display='block';
+      btn.textContent=result.success?'Contrato enviado y descargado':'PDF descargado (revisar conexion)';
+    })
+    .catch(function(){
+      buildPDF(getDatos(),canvas.toDataURL('image/png'));
+      document.getElementById('exito-box').style.display='block';
+      document.getElementById('btn-movil').style.display='block';
+      btn.textContent='PDF generado';
+    });
+}
+
+function dataURLtoBlob(dataURL){
+  var arr=dataURL.split(','),mime=arr[0].match(/:(.*?);/)[1];
+  var bstr=atob(arr[1]),n=bstr.length,u8=new Uint8Array(n);
+  while(n--){u8[n]=bstr.charCodeAt(n);}
+  return new Blob([u8],{type:mime});
 }
 
 function descMovil() {
